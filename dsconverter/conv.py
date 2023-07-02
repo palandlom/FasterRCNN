@@ -85,11 +85,15 @@ def convert(dataset_path, out_path) -> List[str]:
 
 
 def create_sample_id_to_is_class_exist_file(obj_class, samples, out_file_path):
+    import random
+
+
     sampleid_to_is_exist = []
     for sample in samples:
         class_is_in_sample = "-1"
         for obj in sample.objects:
-            if obj.name == obj_class:
+            if obj.name == obj_class: #TODO tmp
+            # if random.choice([True, False]) and random.choice([True, False]) and random.choice([True, False]):
                 class_is_in_sample = "1"
                 break  # to the next sample
 

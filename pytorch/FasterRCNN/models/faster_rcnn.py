@@ -399,7 +399,8 @@ class FasterRCNNModel(nn.Module):
     num_positive_samples = min(self._rpn_minibatch_size // 2, num_positive_anchors) # up to half the samples should be positive, if possible
     num_negative_samples = self._rpn_minibatch_size - num_positive_samples          # the rest should be negative
     positive_anchor_idxs = random.sample(range(num_positive_anchors), num_positive_samples)
-    negative_anchor_idxs = random.sample(range(num_negative_anchors), num_negative_samples)
+    # negative_anchor_idxs = random.sample(range(num_negative_anchors), num_negative_samples)  # <-- error is here
+    negative_anchor_idxs = random.sample(range(num_negative_anchors), min(num_negative_samples, num_negative_anchors))
 
     # Construct index expressions into RPN map
     positive_anchors = positive_anchors[positive_anchor_idxs]
