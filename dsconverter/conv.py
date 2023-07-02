@@ -22,7 +22,7 @@ def convert(dataset_path, out_path) -> List[str]:
     train_samples = get_samples_with_id_assigning(dataset_train_path, first_id=1)
     test_samples = get_samples_with_id_assigning(dataset_test_path, first_id=int(train_samples[-1].id) + 1)
     val_samples = []
-    trainval_samples = []
+    trainval_samples = train_samples
 
     # Collect classes of objects
     obj_classes = get_object_classes(train_samples)
@@ -59,6 +59,11 @@ def convert(dataset_path, out_path) -> List[str]:
                                                 os.path.join(main_subdir, f"{obj_class}_val.txt"))
         create_sample_id_to_is_class_exist_file(obj_class, trainval_samples,
                                                 os.path.join(main_subdir, f"{obj_class}_trainval.txt"))
+
+    create_file_with_sample_ids(train_samples, os.path.join(main_subdir, f"train.txt"))
+    create_file_with_sample_ids(test_samples, os.path.join(main_subdir, f"test.txt"))
+    create_file_with_sample_ids(trainval_samples, os.path.join(main_subdir, f"trainval.txt"))
+    create_file_with_sample_ids(val_samples, os.path.join(main_subdir, f"val.txt"))
 
     # === Fill ImagesSets/Layout folder ! maybe useless
     create_file_with_sample_ids(train_samples, os.path.join(layout_subdir, f"train.txt"))
