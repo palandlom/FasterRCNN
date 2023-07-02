@@ -1,6 +1,7 @@
 
 test/
 test2/
+*.log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
