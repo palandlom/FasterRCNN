@@ -7,14 +7,10 @@ log.basicConfig(level=log.INFO, filename="dsconverter.log", filemode="w")
 # log.basicConfig(level=log.DEBUG, filename="dsconverter.log", filemode="w")
 
 from typing import List
-
-import lxml
 from lxml import objectify
-
 from dsconverter.models import DatasetSample
 
-# me
-print("sys.argv ", sys.argv)
+obj_classes_filename = "obj_classes.txt"
 
 
 def convert(dataset_path, out_path) -> List[str]:
@@ -75,6 +71,10 @@ def convert(dataset_path, out_path) -> List[str]:
     create_file_with_sample_ids(test_samples, os.path.join(segmentation_subdir, f"test.txt"))
     create_file_with_sample_ids(trainval_samples, os.path.join(segmentation_subdir, f"trainval.txt"))
     create_file_with_sample_ids(val_samples, os.path.join(segmentation_subdir, f"val.txt"))
+
+    with open(os.path.join(out_path, obj_classes_filename), mode="w") as f:
+        for cls in obj_classes:
+            f.write(f"{cls}\n")
 
     return obj_classes
 

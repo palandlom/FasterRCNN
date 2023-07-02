@@ -26,41 +26,52 @@ import xml.etree.ElementTree as ET
 from typing import List
 from typing import Tuple
 
+import dsconverter.conv
 from .training_sample import Box
 from .training_sample import TrainingSample
 from . import image
 from pytorch.FasterRCNN.models import anchors
+
+def get_dataset_classes(obj_classes_file_path):
+  id_to_class={0 : "background"}
+  with open(obj_classes_file_path, mode="r") as f:
+    for id, cls in enumerate([line.rstrip() for line in f], start=1):
+      if len(cls)>0:
+        id_to_class[id]=cls
+  return id_to_class
 
 
 class Dataset:
   """
   A VOC dataset iterator for a particular split (train, val, etc.)
   """
-
-  num_classes = 21
-  class_index_to_name = {
-    0:  "background",
-    1:  "aeroplane",
-    2:  "bicycle",
-    3:  "bird",
-    4:  "boat",
-    5:  "bottle",
-    6:  "bus",
-    7:  "car",
-    8:  "cat",
-    9:  "chair",
-    10: "cow",
-    11: "diningtable",
-    12: "dog",
-    13: "horse",
-    14: "motorbike",
-    15: "person",
-    16: "pottedplant",
-    17: "sheep",
-    18: "sofa",
-    19: "train",
-    20: "tvmonitor"
-  }
+  # TODO send obj_classes_file by sscript param
+  class_index_to_name = get_dataset_classes(os.path.join("/content/VOCBirds/") + dsconverter.conv.obj_classes_filename)
+  num_classes = len(class_index_to_name)
+  # num_classes = 21
+  # class_index_to_name = {
+  #   0:  "background",
+  #   1:  "aeroplane",
+  #   2:  "bicycle",
+  #   3:  "bird",
+  #   4:  "boat",
+  #   5:  "bottle",
+  #   6:  "bus",
+  #   7:  "car",
+  #   8:  "cat",
+  #   9:  "chair",
+  #   10: "cow",
+  #   11: "diningtable",
+  #   12: "dog",
+  #   13: "horse",
+  #   14: "motorbike",
+  #   15: "person",
+  #   16: "pottedplant",
+  #   17: "sheep",
+  #   18: "sofa",
+  #   19: "train",
+  #   20: "tvmonitor"
+  # }
 
   def __init__(self, split, image_preprocessing_params, compute_feature_map_shape_fn, feature_pixels = 16, dir = "VOCdevkit/VOC2007", augment = True, shuffle = True, allow_difficult = False, cache = True):
     """
@@ -300,3 +311,5 @@ class Dataset:
       assert len(boxes) > 0
       gt_boxes_by_filepath[filepath] = boxes
     return gt_boxes_by_filepath
+
+
