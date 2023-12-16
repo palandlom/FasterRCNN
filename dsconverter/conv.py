@@ -6,21 +6,56 @@ import logging as log
 log.basicConfig(level=log.INFO, filename="dsconverter.log", filemode="w")
 # log.basicConfig(level=log.DEBUG, filename="dsconverter.log", filemode="w")
 
-from typing import List
+from typing import List, Tuple
 from lxml import objectify
 from dsconverter.models import DatasetSample
+import random
+from sklearn.model_selection import train_test_split
 
 obj_classes_filename = "obj_classes.txt"
 
 
-def convert(dataset_path, out_path) -> List[str]:
-    dataset_path = os.path.abspath(dataset_path)
-    dataset_train_path = os.path.join(dataset_path, "train")
-    dataset_test_path = os.path.join(dataset_path, "test")
+def get_train_and_test_samples(dataset_path,
+                               train_subdir_name=None,
+                               test_subdir_name=None) \
+        -> Tuple[List[DatasetSample], List[DatasetSample]]:
+    if train_subdir_name is None and test_subdir_name is None:
+        allFineNameToLowerCase(dataset_path)
+        all_samples = get_samples_with_id_assigning(dataset_path, first_id=1)
+    else:
+
+        dataset_train_path = os.path.join(dataset_path, train_subdir_name)
+        dataset_test_path = os.path.join(dataset_path, test_subdir_name)
+
+        allFineNameToLowerCase(dataset_test_path)
+        allFineNameToLowerCase(dataset_train_path)
+
+        train_samples = get_samples_with_id_assigning(dataset_train_path, first_id=1)
+        test_samples = get_samples_with_id_assigning(dataset_test_path, first_id=int(train_samples[-1].id) + 1)
+        all_samples = train_samples
+        all_samples.extend(test_samples)
+
+    # quantity_10_percent = percentage(10, len(all_samples))
+    # train_samples=random.sample(all_samples, quantity_10_percent)
+
+    train_samples, test_samples = train_test_split(all_samples, test_size=0.1, shuffle=True)
+
+    return train_samples, test_samples
+
+
+def convert(dataset_path, out_path, train_subdir_name=None, test_subdir_name=None) -> List[str]:
+    # Define subpaths in dataset_path
+    # dataset_path = os.path.abspath(dataset_path)
+    # dataset_train_path = os.path.join(dataset_path, "train")
+    # dataset_test_path = os.path.join(dataset_path, "test")
 
     # Collect samples
-    train_samples = get_samples_with_id_assigning(dataset_train_path, first_id=1)
-    test_samples = get_samples_with_id_assigning(dataset_test_path, first_id=int(train_samples[-1].id) + 1)
+    # train_samples = get_samples_with_id_assigning(dataset_train_path, first_id=1)
+    # test_samples = get_samples_with_id_assigning(dataset_test_path, first_id=int(train_samples[-1].id) + 1)
+    # val_samples = []
+    # trainval_samples = train_samples
+
+    train_samples, test_samples = get_train_and_test_samples(dataset_path, train_subdir_name, test_subdir_name)
     val_samples = []
     trainval_samples = train_samples
 
@@ -87,13 +122,12 @@ def convert(dataset_path, out_path) -> List[str]:
 def create_sample_id_to_is_class_exist_file(obj_class, samples, out_file_path):
     import random
 
-
     sampleid_to_is_exist = []
     for sample in samples:
         class_is_in_sample = "-1"
         for obj in sample.objects:
-            if obj.name == obj_class: #TODO tmp
-            # if random.choice([True, False]) and random.choice([True, False]) and random.choice([True, False]):
+            if obj.name == obj_class:  # TODO tmp
+                # if random.choice([True, False]) and random.choice([True, False]) and random.choice([True, False]):
                 class_is_in_sample = "1"
                 break  # to the next sample
 
@@ -144,7 +178,7 @@ def get_samples_with_id_assigning(dataset_path, first_id=1) -> List[DatasetSampl
     samples = []
     n = first_id
     for filename in os.listdir(dataset_path):
-        f = os.path.join(dataset_path, filename)
+        f = os.path.join(dataset_path, filename.lower())
 
         # Construct samples from label-files ...
         if os.path.isfile(f) and filename.endswith(".xml"):
@@ -176,3 +210,12 @@ def get_object_classes(samples: List[DatasetSample]) -> List[str]:
             cls.add(obj.name)
     log.info(f"Get {len(cls)} classes of objects ")
     return list(cls)
+
+
+def percentage(percent, whole):
+    return (percent * whole) / 100.0
+
+
+def allFineNameToLowerCase(dirpath):
+    for file in os.listdir(dirpath):
+        os.rename(os.path.join(dirpath, file), os.path.join(dirpath, file.lower()))
