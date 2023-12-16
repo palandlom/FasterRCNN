@@ -4,6 +4,8 @@ import sys
 
 import dsconverter.conv
 
+# TODO временный файл для запуска конвертера с произвольно папкой
+
 # dataset_path = "C:/Users/cride/Downloads/archive/"
 dataset_path = "/drv/necLindata/ml/NeuroBirds/"
 # output_path = "../test/"

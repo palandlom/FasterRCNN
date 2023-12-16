@@ -1,6 +1,26 @@
 # Faster R-CNN in PyTorch and TensorFlow 2 w/ Keras
 *Copyright 2021-2022 Bart Trzynadlowski*
 
+## TODO
+В ноутбуке 
+https://colab.research.google.com/drive/1lKXk7r_MPYevSLCB33phXXhrPIRMZpw5?authuser=1#scrollTo=bnNgzTnrfX9L
+поправить использование полученной модели модели
+сча резудьтат кладется в папку
+/content/FasterRCNN/predictions-score.json
+
+модель
+out_model_path="/content/results_final.pth"
+/drv/necLindata/ml/neuro_bird_model.pth
+
+
+напо поправить вот этот режим работы модели
+```shell
+python -m pytorch.FasterRCNN --load-from=${out_model_path} --predict-all=${pict_dir}
+```
+сча ошибка
+FileNotFoundError: Dataset directory does not exist: VOCdevkit/VOC2007
+
+
 ## Overview
 
 <p align="center">
